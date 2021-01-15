@@ -1,0 +1,21 @@
+{
+  "name": "dianpingscraper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.0",
+    "cookie": "^0.4.1",
+    "dayjs": "^1.9.4",
+    "form-data": "^3.0.0",
+    "mongodb": "^3.6.2",
+    "puppeteer": "^5.3.1",
+    "puppeteer-extra": "^3.1.15",
+    "puppeteer-extra-plugin-stealth": "^2.6.5"
+  }
+}
