@@ -1,0 +1,5 @@
+node_modules
+OCRResult
+Screenshot
+*.json
+*.csv
