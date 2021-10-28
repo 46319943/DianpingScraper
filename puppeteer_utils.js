@@ -1,3 +1,7 @@
+const cookie = require("cookie");
+const readline = require("readline");
+
+
 /**
  * 访问页面，自动超时重试
  * @param {*} page
@@ -87,4 +91,12 @@ function askQuestion(query) {
       resolve(ans);
     })
   );
+}
+
+module.exports = {
+  pageGoto,
+  pageGotoVerify,
+  scrollToBottom,
+  parseCookie,
+  askQuestion
 }
