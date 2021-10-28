@@ -28,6 +28,8 @@ async function main() {
     )
   );
 
+  // TODO: 降级Puppeteer到9.1.1版本，避免截图BUG
+
   await scrapeComment(page, "l4twNneJonrrRkFe", "黄鹤楼", "2019-06-01");
 
   // await parseUserPage(page, `http://www.dianping.com/member/1281028058`);
