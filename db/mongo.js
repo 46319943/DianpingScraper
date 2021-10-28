@@ -1,16 +1,16 @@
-const MongoClient = require('mongodb').MongoClient;
-const ObjectID = require('mongodb').ObjectID;
+const MongoClient = require("mongodb").MongoClient;
+const ObjectID = require("mongodb").ObjectID;
 
-let url = 'mongodb://admin:admin123@101.132.152.93:27017'
+let url = "mongodb://localhost:27017";
 let client = MongoClient.connect(url);
-let dianping = client.then(client => client.db('dianping'));
+let dianping = client.then((client) => client.db("dianping"));
 
 module.exports = {
-    client,
-    news: dianping,
-    comment: dianping.then(db => db.collection('comment')),
-    huanlegu: dianping.then(db => db.collection('huanlegu')),
-    user: dianping.then(db => db.collection('user')),
-    ObjectID,
-    ID: (id) => new ObjectID(id),
-}
+  client,
+  news: dianping,
+  comment: dianping.then((db) => db.collection("comment")),
+  huanlegu: dianping.then((db) => db.collection("huanlegu")),
+  user: dianping.then((db) => db.collection("user")),
+  ObjectID,
+  ID: (id) => new ObjectID(id),
+};

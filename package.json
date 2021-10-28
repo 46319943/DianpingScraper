@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/puppeteer": "^5.4.4",
     "axios": "^0.21.0",
     "cookie": "^0.4.1",
     "dayjs": "^1.9.4",
