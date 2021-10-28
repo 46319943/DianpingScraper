@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../../HousePricing/Data/DataProcessScript/.idea/DataProcessScript.iml" filepath="$PROJECT_DIR$/../../HousePricing/Data/DataProcessScript/.idea/DataProcessScript.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/DianpingScraper.iml" filepath="$PROJECT_DIR$/.idea/DianpingScraper.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../DianpingStat/.idea/DianpingStat.iml" filepath="$PROJECT_DIR$/../DianpingStat/.idea/DianpingStat.iml" />
+    </modules>
+  </component>
+</project>
