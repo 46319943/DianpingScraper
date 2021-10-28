@@ -17,7 +17,14 @@ async function main() {
 
     const browser = await puppeteer.launch({
         headless: false,
-        defaultViewport: { width: 1200, height: 1200 }
+        defaultViewport: null,
+        args: [
+            '--start-maximized', // you can also use '--start-fullscreen'
+            '--disable-background-timer-throttling',
+            '--disable-backgrounding-occluded-windows',
+            '--disable-renderer-backgrounding'
+        ],
+        ignoreDefaultArgs: ['--enable-automation'],
     });
 
     // const browser = await puppeteer.launch({
@@ -30,8 +37,24 @@ async function main() {
 
     const page = await browser.newPage();
     await page.setCookie(...parseCookie(
-        `_lxsdk_cuid=1770150e271c8-06a2b88c5a1d19-31346d-1fa400-1770150e271c8; _lxsdk=1770150e271c8-06a2b88c5a1d19-31346d-1fa400-1770150e271c8; _hc.v=08d704ce-2e42-c04e-4713-c85b0c81e7b2.1610634815; ua=dpuser_8925286360; ctu=e48dc820dbb5c36c649b9e4a6c19b95aae51c91ea124c2f5c60f6ca45c53b501; aburl=1; cy=16; cye=wuhan; Hm_lvt_602b80cf8079ae6591966cc70a3940e7=1610692980; lgtoken=07c20ad9e-4148-410b-906d-37501773dd76; dplet=00de13d1c864bd5a76bee6688baa676d; dper=db2cc5552c2370649b900e423a34ebf527499b40b3d8c76a92aa99ffd76e8f8b946626c5824aa7e4ce951d0a6174c2061580896de7de557e49588141ca2592e8ba003b4b2767e4ceca5d89f5dc024591a3edba3322a006e9472532533b266911; ll=7fd06e815b796be3df069dec7836c3df; Hm_lpvt_602b80cf8079ae6591966cc70a3940e7=1610693046; _lxsdk_s=17704c85931-4de-f96-e18%7C%7C188`
+        `Hm_lvt_602b80cf8079ae6591966cc70a3940e7=1612156012; lgtoken=0a590ae94-2eac-4485-aafb-a6a296b5652d; dplet=5580a25a822c72a0fd84cf4bfaf2dec0; dper=db2cc5552c2370649b900e423a34ebf5f021b31549e49955fee455b3d869d3a965ce23b3fe8267f871fd7934ad77595680703eaebfffbd9851d4ebec62a8fdfa; ll=7fd06e815b796be3df069dec7836c3df; ua=dpuser_8925286360; ctu=e48dc820dbb5c36c649b9e4a6c19b95a65373169ae1d9b39314e0b594106edab; _lxsdk_cuid=1775bfce8c7c8-0527415135ca71-13e3563-1fa400-1775bfce8c7c8; _lxsdk=1775bfce8c7c8-0527415135ca71-13e3563-1fa400-1775bfce8c7c8; _hc.v=ed1851f5-757b-c45f-5d1e-ed7da6818c80.1612156038; Hm_lpvt_602b80cf8079ae6591966cc70a3940e7=1612156038; _lxsdk_s=1775bfce8c8-d-00c-edb%7C%7C143`
     ));
+
+    // await page.setRequestInterception(true);
+    // page.on('request', (request) => {
+    //     if (request.resourceType() === 'image') {
+    //         if (request.url().includes('img.meituan.net')) {
+    //             request.abort();
+    //         }
+    //         else {
+
+
+    //             request.continue();
+
+    //         }
+    //     }
+    //     else request.continue();
+    // });
 
     // await page.evaluateOnNewDocument(() => {
     //     Object.defineProperty(navigator, 'webdriver', {
@@ -40,8 +63,8 @@ async function main() {
     // }
     // )
 
-    // await scrapeDianpingID(page, 'H2Q2A123LD7896JD', '武汉欢乐谷', '2019-06-01', 341)
-    await scrapeDianpingID(page, 'l4twNneJonrrRkFe', '黄鹤楼', '2019-06-01', 300, false, true)
+    // await scrapeDianpingID(page, 'H2Q2A123LD7896JD', '武汉欢乐谷', '2019-06-01', 1, false, false)
+    // await scrapeDianpingID(page, 'l4twNneJonrrRkFe', '黄鹤楼', '2019-06-01', 1, false, true)
     // await scrapeDianpingID(page, 'G5JIcZK8I0eTG56c', '武汉海昌极地海洋公园', '2019-06-01', 1)
     // await scrapeDianpingID(page, 'G72ThBsbTbQ6dckr', '东湖生态旅游风景区', '2019-06-01', 1)
     // await scrapeDianpingID(page, 'H7MaUL9AZzhfQzb2', '汉口江滩', '2019-06-01', 1)
@@ -50,7 +73,7 @@ async function main() {
     // await scrapeDianpingID(page, 'G9JFLlejfHnYj0Ad', '武汉长江大桥', '2019-06-01', 1)
     // await scrapeDianpingID(page, 'GadvNzKDoVMzYdXr', '户部巷', '2019-06-01', 1)
     // await scrapeDianpingID(page, 'k3qnFDINnEoc0fTM', '中央文化区楚河汉街', '2019-06-01', 1)
-    // await scrapeDianpingID(page, 'iumGREeKWtY3XakP', '知音号', '2019-06-01', 14)
+    // await scrapeDianpingID(page, 'iumGREeKWtY3XakP', '知音号', '2019-06-01', 1)
     // await scrapeDianpingID(page, 'jUnafIn0y3IurrsI', '武汉木兰草原风景区', '2019-06-01', 1)
     // await scrapeDianpingID(page, 'EQWTzDm5b6Wq1unx', '昙华林', '2019-06-01', 1)
     // await scrapeDianpingID(page, 'l2rRqM0irigmO59c', '古德寺', '2019-06-01', 1)
@@ -58,7 +81,7 @@ async function main() {
 
 
     // await scrapeDianpingID(page, 'k8A6XzEeOdNmFxao', '木兰天池风景区', '2019-06-01', 1)
-    // await scrapeDianpingID(page, 'H8NTFE0xyhxFAUW5', '汉秀剧场', '2019-06-01', 14)
+    // await scrapeDianpingID(page, 'H8NTFE0xyhxFAUW5', '汉秀剧场', '2019-06-01', 1)
     // await scrapeDianpingID(page, 'l640mii2kGDjloaq', '归元禅寺', '2019-06-01', 1)
     // await scrapeDianpingID(page, 'H8rQEyKg4NWh4Ahh', '世界城光谷步行街', '2019-06-01', 1)
     // await scrapeDianpingID(page, 'k1KNud9nOzUvAEJG', '马鞍山森林公园', '2019-06-01', 1)
@@ -82,12 +105,12 @@ async function main() {
     // await scrapeDianpingID(page, 'l1kyMWuY2RYl0KHP', '光谷德国风情街', '2019-06-01', 1)
     // await scrapeDianpingID(page, 'kaYiy1cMkWhbuS3f', '意大利风情街', '2019-06-01', 1)
     // await scrapeDianpingID(page, 'EdThcl28xyAvSh8e', '盘龙城国家考古遗址公园', '2019-06-01', 1)
-    // await scrapeDianpingID(page, 'k9U7srosHqHEeAAW', '东湖听涛景区', '2019-06-01', 1)
-    // await scrapeDianpingID(page, 'G7q9cg3kdIaJbAn7', '后官湖国家湿地公园', '2019-06-01', 1)
-    // await scrapeDianpingID(page, 'FZSJJ4k6xUeQLWha', '武汉紫薇都市田园', '2019-06-01', 1)
-    // await scrapeDianpingID(page, 'k3ksYMy4VmGIvYZ7', '武昌江滩', '2019-06-01', 1)
-    // await scrapeDianpingID(page, 'l9zmX0zybNGWIP9Y', '万国公园', '2019-06-01', 1)
-    // await scrapeDianpingID(page, 'EnfNDnhAJHbD81XU', '东湖磨山欢乐丛林', '2019-06-01', 1)
+    await scrapeDianpingID(page, 'k9U7srosHqHEeAAW', '东湖听涛景区', '2019-06-01', 1)
+    await scrapeDianpingID(page, 'G7q9cg3kdIaJbAn7', '后官湖国家湿地公园', '2019-06-01', 1)
+    await scrapeDianpingID(page, 'FZSJJ4k6xUeQLWha', '武汉紫薇都市田园', '2019-06-01', 1)
+    await scrapeDianpingID(page, 'k3ksYMy4VmGIvYZ7', '武昌江滩', '2019-06-01', 1)
+    await scrapeDianpingID(page, 'l9zmX0zybNGWIP9Y', '万国公园', '2019-06-01', 1)
+    await scrapeDianpingID(page, 'EnfNDnhAJHbD81XU', '东湖磨山欢乐丛林', '2019-06-01', 1)
 
 
 
@@ -95,6 +118,7 @@ async function main() {
     // await scrapeDianpingUserInDB();
 
     await browser.close();
+    await (await mongo.client).close();
     return 0;
 }
 
@@ -142,7 +166,7 @@ async function pageGoto(page, url) {
  * 
  * @returns {Boolean} 是否继续爬取
  */
-async function parseCommentListPage(page, url, dianping_id, dianping_name, time_limit, overwrite = false, picture_supply = false) {
+async function parseCommentListPage(page, url, dianping_id, dianping_name, time_limit, overwrite = false, only_picture_supply = false) {
     await pageGoto(page, url);
 
     // 获取评论列表的各个评论元素
@@ -266,8 +290,8 @@ async function parseCommentListPage(page, url, dianping_id, dianping_name, time_
                 return resultObject;
             });
 
-        // 对已有评论的大图的补充
-        if (picture_supply) {
+        // 仅对已有评论的大图的补充
+        if (only_picture_supply) {
             let existQueryResult = await (await mongo.comment).findOne({ id: resultObject['id'] });
             if (!existQueryResult) {
                 continue;
@@ -287,7 +311,15 @@ async function parseCommentListPage(page, url, dianping_id, dianping_name, time_
 
         // 判断是否已经存在
         if (!overwrite) {
-            let existQueryResult = await (await mongo.comment).findOne({ id: resultObject['id'] });
+            let existQueryResult = await (await mongo.comment).findOne(
+                { id: resultObject['id'] },
+                {
+                    projection: {
+                        'id': 1,
+                        // 'image_list': 1
+                    }
+                }
+            );
             if (existQueryResult) {
                 // 更新大图
                 let updateMongoResult = await (await mongo.comment).updateOne(
@@ -458,7 +490,6 @@ async function parseUserPage(page, url) {
             // 注册时间
             resultObject['register_time'] = document.querySelectorAll('.user-time p')[1].innerText.replace('注册时间：', '');
 
-            /** @type {Array<HTMLElement>} */
             let attentionElementList = document.querySelectorAll('.user_atten li strong');
             for (let attentionElement of attentionElementList) {
                 attentionElement.style.width = 'fit-content';
