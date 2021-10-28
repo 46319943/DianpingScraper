@@ -1,12 +1,11 @@
-const { scrape_time } = require("./scrape_utils");
-const { pageGotoVerify } = require("./puppeteer_utils");
-
-
-const fs = require("fs");
 const FormData = require("form-data");
 const axios = require("axios").default;
 const mongo = require("./db/mongo");
 const dayjs = require("dayjs");
+
+const { scrape_time } = require("./scrape_utils");
+const { pageGotoVerify } = require("./puppeteer_utils");
+
 /**
  * 爬取数据库中所有评论的用户信息
  */

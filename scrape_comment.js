@@ -5,6 +5,7 @@ const mongo = require("./db/mongo");
 const dayjs = require("dayjs");
 
 const { pageGotoVerify } = require("./puppeteer_utils");
+const { scrape_time } = require("./scrape_utils");
 
 /**
  * 爬取大众点评某一景点评论
@@ -266,7 +267,7 @@ async function scrapeCommentListPage(
     // 打印、存入数据库
     console.log(resultObject);
     let updateMongoResult = await (
-      await mongo.comment
+      await mongo.huanghelou
     ).updateOne(
       { id: resultObject["id"] },
       { $set: resultObject },
