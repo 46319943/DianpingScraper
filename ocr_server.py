@@ -7,6 +7,9 @@ from PIL.Image import Image as ImageClass
 from flask import Flask, request
 from paddleocr import PaddleOCR, draw_ocr
 
+import os
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
+
 app = Flask(__name__)
 
 ocr = PaddleOCR(
