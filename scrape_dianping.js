@@ -3,14 +3,9 @@ const puppeteerExtra = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 puppeteerExtra.use(StealthPlugin());
 
-const cookie = require("cookie");
-const readline = require("readline");
-const fs = require("fs");
-const FormData = require("form-data");
-const axios = require("axios").default;
-const mongo = require("./db/mongo");
-const dayjs = require("dayjs");
 const { user } = require("./db/mongo");
+const { parseCookie } = require("./puppeteer_utils");
+const { scrapeComment } = require("./scrape_comment");
 
 async function main() {
   const browser = await puppeteerExtra.launch({
@@ -32,7 +27,7 @@ async function main() {
     )
   );
 
-  await scrapeDianpingID(page, "l4twNneJonrrRkFe", "黄鹤楼", "2019-06-01");
+  await scrapeComment(page, "l4twNneJonrrRkFe", "黄鹤楼", "2019-06-01");
 
   // await parseUserPage(page, `http://www.dianping.com/member/1281028058`);
   // await scrapeDianpingUserInDB();

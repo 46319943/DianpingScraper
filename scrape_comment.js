@@ -1,3 +1,11 @@
+const fs = require("fs");
+const FormData = require("form-data");
+const axios = require("axios").default;
+const mongo = require("./db/mongo");
+const dayjs = require("dayjs");
+
+const { pageGotoVerify } = require("./puppeteer_utils");
+
 /**
  * 爬取大众点评某一景点评论
  *
@@ -277,3 +285,9 @@ async function scrapeCommentListPage(
 async function parseCommentPage(page, url) {
   // TODO
 }
+
+module.exports = {
+  scrapeComment,
+  scrapeCommentListPage,
+  parseCommentPage,
+};

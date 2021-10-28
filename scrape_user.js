@@ -1,5 +1,12 @@
 const { scrape_time } = require("./scrape_utils");
+const { pageGotoVerify } = require("./puppeteer_utils");
 
+
+const fs = require("fs");
+const FormData = require("form-data");
+const axios = require("axios").default;
+const mongo = require("./db/mongo");
+const dayjs = require("dayjs");
 /**
  * 爬取数据库中所有评论的用户信息
  */
@@ -159,4 +166,12 @@ async function commentUserList() {
     userUrlList.push(comment["user_url"]);
   }
   return userUrlList;
+}
+
+
+module.exports = {
+    scrapeDianpingUserInDB,
+    parseUserPage,
+    scrapeAttentionInfo,
+    commentUserList
 }
