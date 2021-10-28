@@ -66,20 +66,28 @@ def detect_labels_download_uri(uri):
         retry -= 1
         try:
             response = requests.get(uri)
+
+            client = vision.ImageAnnotatorClient()
+
+            content = response.content
+            image = vision.Image(content=content)
+            response = client.label_detection(image=image)
+            labels = response.label_annotations
+
+            if response.error.message:
+                # raise Exception(
+                #     '{}\nFor more info on error messages, check: '
+                #     'https://cloud.google.com/apis/design/errors'.format(
+                #         response.error.message))
+                print(
+                    '{}\nFor more info on error messages, check: '
+                    'https://cloud.google.com/apis/design/errors'.format(
+                        response.error.message)
+                )
+                continue
             break
         except requests.exceptions.ProxyError:
             logging.exception('请求错误')
-
-    client = vision.ImageAnnotatorClient()
-    image = vision.Image(content=response.content)
-    response = client.label_detection(image=image)
-    labels = response.label_annotations
-
-    if response.error.message:
-        raise Exception(
-            '{}\nFor more info on error messages, check: '
-            'https://cloud.google.com/apis/design/errors'.format(
-                response.error.message))
 
     return labels
 
@@ -219,10 +227,12 @@ def dianping_image_process_origin(task_num=20):
         {
             '$and': [
                 {'image_list': {'$exists': True}},
-                {'label_origin': {'$exists': False}}
+                # {'label_origin': {'$exists': False}},
+                {'label_origin_url': {'$exists': False}},
+                # {'dianping_name': '黄鹤楼'}
             ]
         }
-        , {'image_list': 1, 'label_origin': 1})
+        , {'image_list': 1, 'label_origin': 1, 'label_origin_url': 1})
     comment_list = list(comment_list)
     task_thread_list = []
     for comment_task_input in numpy.array_split(numpy.array(comment_list), task_num):
@@ -243,21 +253,28 @@ def dianping_comment_list_process_origin(comment_list):
         count += 1
 
         # 注意在MongoDB查询的Projection中也需要设置显示该字段
-        if 'label_origin' in comment:
+        if 'label_origin' in comment and 'label_origin_url' in comment:
             continue
+            pass
 
         if len(comment['image_list']) == 0:
             continue
 
+        # 随机从照片列表中取一张图片
         image_meta_index = numpy.random.choice(len(comment['image_list']), 1)[0]
         image_meta = comment['image_list'][image_meta_index]
 
-        if image_meta['src'] == '':
+        if 'big' not in image_meta:
             comment['label_origin'] = []
+            comment['label_origin_url'] = ''
+        elif image_meta['big'] == '':
+            comment['label_origin'] = []
+            comment['label_origin_url'] = ''
         elif 'label_origin' in image_meta:
             comment['label_origin'] = image_meta['label_origin']
+            comment['label_origin_url'] = image_meta['big']
         else:
-            label_result = detect_labels_download_uri(image_meta['src'])
+            label_result = detect_labels_download_uri(image_meta['big'])
             label_list = [
                 {
                     'description': label_object.description,
@@ -265,13 +282,19 @@ def dianping_comment_list_process_origin(comment_list):
                 }
                 for label_object in label_result
             ]
-            comment['label_single'] = label_list
+
+            # 将标签结果存入图片元数据
+            image_meta['label_origin'] = label_list
+
+            # 同时将标签结果和对应原图URL存入评论
+            comment['label_origin'] = label_list
+            comment['label_origin_url'] = image_meta['big']
 
         mongo_comment_dianping.update_one({'_id': comment['_id']}, {'$set': comment})
         print(f'处理文档：{comment["_id"]}，{count}/{len(comment_list)}')
 
 
-dianping_image_process_single()
+dianping_image_process_origin()
 
 # detect_labels_download_uri(
 #     'https://qcloud.dpfile.com/pc/ezbY-f822sra-d1niS_KXHD5YFNL-l0Rwc5oXxbchXHE6k5QSHnK8Z3Dl8GWJDoIUBBCaBtJvKU_sxCtKYAYUQ.jpg')
