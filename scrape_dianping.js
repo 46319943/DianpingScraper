@@ -13,6 +13,7 @@ async function main() {
     defaultViewport: null,
     args: [
       "--start-maximized", // you can also use '--start-fullscreen'
+      // '--start-fullscreen',
       "--disable-background-timer-throttling",
       "--disable-backgrounding-occluded-windows",
       "--disable-renderer-backgrounding",
