@@ -219,6 +219,7 @@ async function scrapeCommentListPage(
     }
 
     // 截图文字图片
+    // Puppeteer BUG: 截图偏移
     let reviewWordsElement = await reviewItem.$(".review-words");
     let screenshotResult = await reviewWordsElement.screenshot({
       path: `Screenshot/${resultObject["id"]}.png`,
