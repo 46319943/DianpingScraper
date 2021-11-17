@@ -29,7 +29,7 @@ async function main() {
   // TODO: 降级Puppeteer到9.1.1版本，避免截图BUG
   // TODO: 降级之后还是有截图BUG，肯定是依赖库什么什么的原因。还是就用无界面模式好了
 
-  await scrapeComment(page, "l4twNneJonrrRkFe", "黄鹤楼", { page_index: 1061 });
+  await scrapeComment(page, "l4twNneJonrrRkFe", "黄鹤楼", { page_index: 1118 });
 
   // await parseUserPage(page, `http://www.dianping.com/member/1281028058`);
   // await scrapeDianpingUserInDB();

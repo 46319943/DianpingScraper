@@ -111,12 +111,15 @@ async function scrapeCommentListPage(
             resultObject["user_url"].match(/member\/(\d+)/)[1];
         }
 
-        // 遍历Class获取评分
-        for (const className of reviewElement.querySelector(".review-rank span")
-          .classList) {
-          if (className.includes("sml-str")) {
-            let intString = className.replace("sml-str", "");
-            resultObject["rank"] = parseInt(intString);
+        // 遍历Class获取评分。2009年10月及之前的评论没有评分，需要判断
+        if (reviewElement.querySelector(".review-rank span")) {
+          for (const className of reviewElement.querySelector(
+            ".review-rank span"
+          ).classList) {
+            if (className.includes("sml-str")) {
+              let intString = className.replace("sml-str", "");
+              resultObject["rank"] = parseInt(intString);
+            }
           }
         }
 
