@@ -20,9 +20,7 @@ async function scrapeComment(
   page,
   dianping_id,
   dianping_name,
-  time_limit = null,
-  page_index = 1,
-  overwrite = false
+  { time_limit = null, page_index = 1, overwrite = false } = {}
 ) {
   while (
     await scrapeCommentListPage(
@@ -57,8 +55,14 @@ async function scrapeCommentListPage(
   let url = `http://www.dianping.com/shop/${dianping_id}/review_all/p${page_index}?queryType=sortType&queryVal=latest`;
   await pageGotoVerify(page, url);
 
-  // 获取评论列表的各个评论元素
+  // 获取评论列表的各个评论元素。
   let reviewList = await page.$$(".reviews-items > ul > li");
+
+  // 有时候会返回空页面
+  if (reviewList.length == 0) {
+    let pageContent = await page.content();
+    debugger;
+  }
 
   for (const reviewItem of reviewList) {
     // 对每个评论元素，在浏览器环境中进行属性值获取
@@ -203,7 +207,7 @@ async function scrapeCommentListPage(
     if (!overwrite) {
       // 判断是否已经存在
       let existQueryResult = await (
-        await mongo.comment
+        await mongo.huanghelou
       ).findOne(
         { id: resultObject["id"] },
         {
