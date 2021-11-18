@@ -16,7 +16,7 @@ async function pageGoto(page, url) {
   // 访问超时循环
   while (true) {
     try {
-      await page.goto(url, { timeout: 45000 });
+      await page.goto(url, { timeout: 15000 });
       break;
     } catch (error) {
       console.log("time out error occur");
