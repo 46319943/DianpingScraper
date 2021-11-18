@@ -62,6 +62,7 @@ async function scrapeCommentListPage(
   if (reviewList.length == 0) {
     let pageContent = await page.content();
     debugger;
+    console.log("爬取完成");
   }
 
   for (const reviewItem of reviewList) {

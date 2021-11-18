@@ -7,9 +7,10 @@ const { scrape_time } = require("./scrape_utils");
 const { pageGotoVerify } = require("./puppeteer_utils");
 
 /**
+ * @param {import('puppeteer').Page} page
  * 爬取数据库中所有评论的用户信息
  */
-async function scrapeDianpingUserInDB() {
+async function scrapeDianpingUserInDB(page) {
   // 获取点评数据库中的用户列表并爬取
   let userUrlList = await commentUserList();
 
@@ -72,7 +73,7 @@ async function parseUserPage(page, url) {
 
     // 注册时间
     resultObject["register_time"] = document
-      .querySelectorAll(".user-time p")[1]
+      .querySelector(".user-time")
       .innerText.replace("注册时间：", "");
 
     let attentionElementList = document.querySelectorAll(
@@ -136,7 +137,7 @@ async function scrapeAttentionInfo(page) {
 
   for (const attentionElement of attentionElementList) {
     let attentionScreenshot = await attentionElement.screenshot({
-      path: "attention_test.png",
+      path: "attention_temp.png",
     });
     // 请求OCR服务
     let formData = new FormData();
@@ -157,20 +158,22 @@ async function scrapeAttentionInfo(page) {
 
 async function commentUserList() {
   // TODO: 匿名用户排除
-  let commentUserResult = await (await mongo.comment)
+  let commentUserResult = await (await mongo.huanghelou)
     .find({}, { projection: { user_url: 1 } })
     .toArray();
   let userUrlList = [];
   for (let comment of commentUserResult) {
-    userUrlList.push(comment["user_url"]);
+    let user_url = comment["user_url"];
+    if (user_url) {
+      userUrlList.push(comment["user_url"]);
+    }
   }
   return userUrlList;
 }
 
-
 module.exports = {
-    scrapeDianpingUserInDB,
-    parseUserPage,
-    scrapeAttentionInfo,
-    commentUserList
-}
+  scrapeDianpingUserInDB,
+  parseUserPage,
+  scrapeAttentionInfo,
+  commentUserList,
+};
