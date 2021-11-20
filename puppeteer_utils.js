@@ -1,4 +1,3 @@
-const cookie = require("cookie");
 const readline = require("readline");
 let { dianping_cookie } = require("./global_variables");
 
@@ -52,6 +51,7 @@ async function pageGotoVerify(page, url) {
     console.log("爬虫被检测，尝试重新登录");
     // await askQuestion("爬虫被检测，更换IP或重新登录，回车继续");
 
+    // 删除本地存储
     await page.evaluate(async () => {
       sessionStorage.clear();
       localStorage.clear();
@@ -60,14 +60,14 @@ async function pageGotoVerify(page, url) {
         indexedDB.deleteDatabase(databaseInfo.name);
       });
     });
+    await page.deleteCookie(...await page.cookies())
+
     let newCookies = await login();
     await page.setCookie(...newCookies);
-
-    // TODO: cookie设置失败? 可能要先删除再设置?
-    let currentCookies = await page.cookies();
-    console.log(currentCookies);
-    
     await pageGoto(page, url);
+
+    // 重新获取当前页面内容
+    pageContent = await page.content()
   }
 
   // 有时候页面是空页面
@@ -102,26 +102,7 @@ async function scrollToBottom() {
   await sleep(2000);
 }
 
-/**
- * 将cookie字符串解析为puppeteer输入格式
- * @param {*} cookieString
- * @param {*} domain
- */
-function parseCookie(cookieString, domain = "http://www.dianping.com") {
-  let cookieObject = cookie.parse(cookieString);
-  let cookieKeyValueList = Array();
-  for (const key in cookieObject) {
-    if (cookieObject.hasOwnProperty(key)) {
-      const element = cookieObject[key];
-      cookieKeyValueList.push({
-        name: key,
-        value: element,
-        url: domain,
-      });
-    }
-  }
-  return cookieKeyValueList;
-}
+
 
 /**
  * 异步等待获取输入
@@ -161,7 +142,7 @@ async function verify() {
   });
   /** @type {puppeteer.Page} */
   const page = await browser.newPage();
-  await page.setCookie(...parseCookie(dianping_cookie));
+  await page.setCookie(...dianping_cookie);
   await pageGoto(
     page,
     "http://www.dianping.com/shop/l4twNneJonrrRkFe/review_all/p58?queryType=sortType&queryVal=latest"
@@ -215,10 +196,11 @@ async function login() {
   return newCookies;
 }
 
+
+
 module.exports = {
   pageGoto,
   pageGotoVerify,
   scrollToBottom,
-  parseCookie,
   askQuestion,
 };
