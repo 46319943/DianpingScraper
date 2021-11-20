@@ -1,5 +1,6 @@
 const readline = require("readline");
 let { dianping_cookie } = require("./global_variables");
+let newCookies = null;
 
 const puppeteer = require("puppeteer");
 const puppeteerExtra = require("puppeteer-extra");
@@ -60,14 +61,14 @@ async function pageGotoVerify(page, url) {
         indexedDB.deleteDatabase(databaseInfo.name);
       });
     });
-    await page.deleteCookie(...await page.cookies())
+    await page.deleteCookie(...(await page.cookies()));
 
     let newCookies = await login();
     await page.setCookie(...newCookies);
     await pageGoto(page, url);
 
     // 重新获取当前页面内容
-    pageContent = await page.content()
+    pageContent = await page.content();
   }
 
   // 有时候页面是空页面
@@ -82,6 +83,9 @@ async function pageGotoVerify(page, url) {
       });
     });
     await pageGoto(page, url);
+
+    // 重新获取当前页面内容
+    pageContent = await page.content();
   }
 
   console.log(`page navigate to ${url}`);
@@ -101,8 +105,6 @@ async function scrollToBottom() {
   });
   await sleep(2000);
 }
-
-
 
 /**
  * 异步等待获取输入
@@ -142,7 +144,11 @@ async function verify() {
   });
   /** @type {puppeteer.Page} */
   const page = await browser.newPage();
-  await page.setCookie(...dianping_cookie);
+  if (newCookies) {
+    await page.setCookie(...newCookies);
+  } else {
+    await page.setCookie(...dianping_cookie);
+  }
   await pageGoto(
     page,
     "http://www.dianping.com/shop/l4twNneJonrrRkFe/review_all/p58?queryType=sortType&queryVal=latest"
@@ -191,12 +197,11 @@ async function login() {
     "https://account.dianping.com/login?redir=https://www.dianping.com/member/8084928"
   );
   await page.waitForSelector("div#top-nav .icon-logo", { timeout: 0 });
-  let newCookies = await page.cookies();
+  let loginCookies = await page.cookies();
   await browser.close();
-  return newCookies;
+  newCookies = loginCookies;
+  return loginCookies;
 }
-
-
 
 module.exports = {
   pageGoto,
