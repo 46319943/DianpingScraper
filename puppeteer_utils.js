@@ -1,6 +1,6 @@
 const cookie = require("cookie");
 const readline = require("readline");
-const { dianping_cookie } = require("./global_variables");
+let { dianping_cookie } = require("./global_variables");
 
 const puppeteer = require("puppeteer");
 const puppeteerExtra = require("puppeteer-extra");
@@ -40,7 +40,7 @@ async function pageGotoVerify(page, url) {
     // await askQuestion("手动打开谷歌浏览器进行验证，回车继续");
     // 自动打开页面
     await verify();
-    console.log('验证成功');
+    console.log("验证成功");
 
     await pageGoto(page, url);
   }
@@ -49,8 +49,9 @@ async function pageGotoVerify(page, url) {
 
   while (pageContent.includes("抱歉！页面无法访问")) {
     console.log(`当前页面：${url}`);
+    console.log("爬虫被检测，尝试重新登录");
+    // await askQuestion("爬虫被检测，更换IP或重新登录，回车继续");
 
-    await askQuestion("IP被封禁，更换IP，回车继续");
     await page.evaluate(async () => {
       sessionStorage.clear();
       localStorage.clear();
@@ -59,7 +60,13 @@ async function pageGotoVerify(page, url) {
         indexedDB.deleteDatabase(databaseInfo.name);
       });
     });
+    let newCookies = await login();
+    await page.setCookie(...newCookies);
 
+    // TODO: cookie设置失败? 可能要先删除再设置?
+    let currentCookies = await page.cookies();
+    console.log(currentCookies);
+    
     await pageGoto(page, url);
   }
 
@@ -177,9 +184,35 @@ async function verify() {
   }
   // checkVerify();
 
-  await browser.close()
+  await browser.close();
 
   return promise;
+}
+
+async function login() {
+  /** @type {puppeteer.Browser} */
+  const browser = await puppeteerExtra.launch({
+    headless: false,
+    defaultViewport: null,
+    args: [
+      "--start-maximized", // you can also use '--start-fullscreen'
+      // '--start-fullscreen',
+      "--disable-background-timer-throttling",
+      "--disable-backgrounding-occluded-windows",
+      "--disable-renderer-backgrounding",
+    ],
+    ignoreDefaultArgs: ["--enable-automation"],
+  });
+  /** @type {puppeteer.Page} */
+  const page = await browser.newPage();
+  await pageGoto(
+    page,
+    "https://account.dianping.com/login?redir=https://www.dianping.com/member/8084928"
+  );
+  await page.waitForSelector("div#top-nav .icon-logo", { timeout: 0 });
+  let newCookies = await page.cookies();
+  await browser.close();
+  return newCookies;
 }
 
 module.exports = {

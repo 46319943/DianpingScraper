@@ -24,7 +24,9 @@ async function main() {
   });
 
   const page = await browser.newPage();
-  await page.setCookie(...parseCookie(dianping_cookie));
+  if(dianping_cookie){
+    await page.setCookie(...parseCookie(dianping_cookie));
+  }
 
   // TODO: 降级Puppeteer到9.1.1版本，避免截图BUG
   // TODO: 降级之后还是有截图BUG，肯定是依赖库什么什么的原因。还是就用无界面模式好了
