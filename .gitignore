@@ -2,3 +2,5 @@ node_modules
 OCRResult
 Screenshot
 *.csv
+*.log
+*.png

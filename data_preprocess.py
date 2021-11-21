@@ -27,12 +27,18 @@ def calculate_text_sentiment(item):
 
 
 def process_item(item):
+    '''
+    处理单个条目
+    '''
     item = calculate_text_sentiment(item)
 
     return item
 
 
 def iter_item(query=None):
+    '''
+    遍历所有条目
+    '''
     fetch_field = []
     obsolete_field = []
     projection_field = {

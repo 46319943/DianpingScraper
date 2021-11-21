@@ -89,6 +89,7 @@ async function verify(url) {
     await page.setCookie(...dianping_cookie);
   }
   await pageGoto(page, url);
+  await page.waitForNavigation({ timeout: 2000 }).catch((reason) => {});
   await page.waitForSelector(".dpHeader > .dpLogo", {
     timeout: 0,
     hidden: true,
