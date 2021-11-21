@@ -3,7 +3,6 @@ const puppeteerExtra = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 puppeteerExtra.use(StealthPlugin());
 
-const { user } = require("./db/mongo");
 const { scrapeComment } = require("./scrape_comment");
 const { scrapeDianpingUserInDB } = require("./scrape_user");
 const { dianping_cookie } = require("./global_variables");

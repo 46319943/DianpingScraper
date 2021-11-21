@@ -33,63 +33,148 @@ async function pageGoto(page, url) {
 async function pageGotoVerify(page, url) {
   await pageGoto(page, url);
 
-  // 获取失败，需要验证
-  while ((await page.title()) == "验证中心") {
-    console.log(`当前页面：${url}`);
+  while (true) {
+    const pageTitle = await page.title();
+    const pageContent = await page.content();
 
-    // await askQuestion("手动打开谷歌浏览器进行验证，回车继续");
-    // 自动打开页面
-    await verify();
-    console.log("验证成功");
-
+    // 验证页面
+    if (pageTitle == "验证中心") {
+      console.log(`当前页面：${url}`);
+      await verify();
+      console.log("验证成功");
+      await pageGoto(page, url);
+    }
+    // 页面无法访问
+    else if (pageContent.includes("抱歉！页面无法访问")) {
+      console.log(`当前页面：${url}`);
+      console.log("爬虫被检测，尝试重新登录");
+      await clearLocal(page);
+      await page.deleteCookie(...(await page.cookies()));
+      let newCookies = await login();
+      await page.setCookie(...newCookies);
+    }
+    // 有时候页面是空页面
+    else if (pageContent == "<html><head></head><body></body></html>") {
+      console.log(`空页面：${url}`);
+      await clearLocal(page);
+    }
+    // 需要登录
+    else if (pageContent.includes('<span class="sub-logo">登录</span>')) {
+      console.log(`当前页面：${url}`);
+      console.log("需要重新登录");
+      await clearLocal(page);
+      await page.deleteCookie(...(await page.cookies()));
+      let newCookies = await login();
+      await page.setCookie(...newCookies);
+    }
+    // 页面正常
+    else {
+      console.log(`page navigate to ${url}`);
+      break;
+    }
     await pageGoto(page, url);
+    continue;
   }
-
-  let pageContent = await page.content();
-
-  while (pageContent.includes("抱歉！页面无法访问")) {
-    console.log(`当前页面：${url}`);
-    console.log("爬虫被检测，尝试重新登录");
-    // await askQuestion("爬虫被检测，更换IP或重新登录，回车继续");
-
-    // 删除本地存储
-    await page.evaluate(async () => {
-      sessionStorage.clear();
-      localStorage.clear();
-      let databseInfoList = await indexedDB.databases();
-      databseInfoList.forEach((databaseInfo) => {
-        indexedDB.deleteDatabase(databaseInfo.name);
-      });
-    });
-    await page.deleteCookie(...(await page.cookies()));
-
-    let newCookies = await login();
-    await page.setCookie(...newCookies);
-    await pageGoto(page, url);
-
-    // 重新获取当前页面内容
-    pageContent = await page.content();
-  }
-
-  // 有时候页面是空页面
-  while (pageContent == "<html><head></head><body></body></html>") {
-    console.log(`空页面：${url}`);
-    await page.evaluate(async () => {
-      sessionStorage.clear();
-      localStorage.clear();
-      let databseInfoList = await indexedDB.databases();
-      databseInfoList.forEach((databaseInfo) => {
-        indexedDB.deleteDatabase(databaseInfo.name);
-      });
-    });
-    await pageGoto(page, url);
-
-    // 重新获取当前页面内容
-    pageContent = await page.content();
-  }
-
-  console.log(`page navigate to ${url}`);
 }
+
+/**
+ * 自动打开页面进行验证
+ * @returns
+ */
+async function verify() {
+  const { browser, page } = await launchPage();
+  if (newCookies) {
+    await page.setCookie(...newCookies);
+  } else {
+    await page.setCookie(...dianping_cookie);
+  }
+  await pageGoto(
+    page,
+    "http://www.dianping.com/shop/l4twNneJonrrRkFe/review_all/p58?queryType=sortType&queryVal=latest"
+  );
+
+  let verifyResolve;
+  let promise = new Promise((resolve) => {
+    verifyResolve = resolve;
+  });
+
+  await page.waitForSelector("a.logo-view", { timeout: 0 });
+  verifyResolve();
+
+  async function checkVerify() {
+    if ((await page.title()) != "验证中心") {
+      verifyResolve();
+      return;
+    }
+    setTimeout(checkVerify, 1000);
+  }
+  // checkVerify();
+
+  await browser.close();
+
+  return promise;
+}
+
+/**
+ * 打开登录页面
+ * 返回登录后的Cookies
+ * @returns
+ */
+async function login() {
+  const { browser, page } = await launchPage();
+  await pageGoto(
+    page,
+    "https://account.dianping.com/login?redir=https://www.dianping.com/member/8084928"
+  );
+  await page.waitForSelector("div#top-nav .icon-logo", { timeout: 0 });
+  let loginCookies = await page.cookies();
+  await browser.close();
+  newCookies = loginCookies;
+  return loginCookies;
+}
+
+/**
+ * 删除本地存储
+ * @param {puppeteer.Page} page
+ */
+async function clearLocal(page) {
+  await page.evaluate(async () => {
+    sessionStorage.clear();
+    localStorage.clear();
+    let databseInfoList = await indexedDB.databases();
+    databseInfoList.forEach((databaseInfo) => {
+      indexedDB.deleteDatabase(databaseInfo.name);
+    });
+  });
+}
+
+/**
+ * 创建一个新浏览器环境和页面
+ * @param {*} param0
+ * @returns
+ */
+async function launchPage({ headless = false } = {}) {
+  /** @type {puppeteer.Browser} */
+  const browser = await puppeteerExtra.launch({
+    headless: headless,
+    defaultViewport: null,
+    args: [
+      "--start-maximized", // you can also use '--start-fullscreen'
+      // '--start-fullscreen',
+      "--disable-background-timer-throttling",
+      "--disable-backgrounding-occluded-windows",
+      "--disable-renderer-backgrounding",
+    ],
+    ignoreDefaultArgs: ["--enable-automation"],
+  });
+  const page = await browser.newPage();
+  return { browser, page };
+}
+
+module.exports = {
+  pageGoto,
+  pageGotoVerify,
+};
 
 /**
  * 浏览器窗口滚动至底部并延时两秒返回Resolved的Promise
@@ -123,89 +208,3 @@ function askQuestion(query) {
     })
   );
 }
-
-/**
- * 自动打开页面进行验证
- * @returns
- */
-async function verify() {
-  /** @type {puppeteer.Browser} */
-  const browser = await puppeteerExtra.launch({
-    headless: false,
-    defaultViewport: null,
-    args: [
-      "--start-maximized", // you can also use '--start-fullscreen'
-      // '--start-fullscreen',
-      "--disable-background-timer-throttling",
-      "--disable-backgrounding-occluded-windows",
-      "--disable-renderer-backgrounding",
-    ],
-    ignoreDefaultArgs: ["--enable-automation"],
-  });
-  /** @type {puppeteer.Page} */
-  const page = await browser.newPage();
-  if (newCookies) {
-    await page.setCookie(...newCookies);
-  } else {
-    await page.setCookie(...dianping_cookie);
-  }
-  await pageGoto(
-    page,
-    "http://www.dianping.com/shop/l4twNneJonrrRkFe/review_all/p58?queryType=sortType&queryVal=latest"
-  );
-
-  let verifyResolve;
-  let promise = new Promise((resolve) => {
-    verifyResolve = resolve;
-  });
-
-  await page.waitForSelector("a.logo-view", { timeout: 0 });
-  verifyResolve();
-
-  async function checkVerify() {
-    if ((await page.title()) != "验证中心") {
-      verifyResolve();
-      return;
-    }
-    setTimeout(checkVerify, 1000);
-  }
-  // checkVerify();
-
-  await browser.close();
-
-  return promise;
-}
-
-async function login() {
-  /** @type {puppeteer.Browser} */
-  const browser = await puppeteerExtra.launch({
-    headless: false,
-    defaultViewport: null,
-    args: [
-      "--start-maximized", // you can also use '--start-fullscreen'
-      // '--start-fullscreen',
-      "--disable-background-timer-throttling",
-      "--disable-backgrounding-occluded-windows",
-      "--disable-renderer-backgrounding",
-    ],
-    ignoreDefaultArgs: ["--enable-automation"],
-  });
-  /** @type {puppeteer.Page} */
-  const page = await browser.newPage();
-  await pageGoto(
-    page,
-    "https://account.dianping.com/login?redir=https://www.dianping.com/member/8084928"
-  );
-  await page.waitForSelector("div#top-nav .icon-logo", { timeout: 0 });
-  let loginCookies = await page.cookies();
-  await browser.close();
-  newCookies = loginCookies;
-  return loginCookies;
-}
-
-module.exports = {
-  pageGoto,
-  pageGotoVerify,
-  scrollToBottom,
-  askQuestion,
-};
