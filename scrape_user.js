@@ -35,67 +35,72 @@ async function scrapeDianpingUserInDB(page) {
 async function parseUserPage(page, url) {
   await pageGotoVerify(page, url);
 
-  let resultObject = await page.evaluate(async () => {
-    let resultObject = {};
+  let resultObject = await page
+    .evaluate(async () => {
+      let resultObject = {};
 
-    // 原始HTML文本
-    resultObject["html"] = document.querySelector("*").outerHTML;
+      // 原始HTML文本
+      resultObject["html"] = document.querySelector("*").outerHTML;
 
-    // 名称
-    resultObject["name"] = document.querySelector("h2.name").innerText;
+      // 名称
+      resultObject["name"] = document.querySelector("h2.name").innerText;
 
-    // 是否为VIP
-    if (document.querySelector(".icon-vip")) {
-      resultObject["is_vip"] = true;
-    } else {
-      resultObject["is_vip"] = false;
-    }
-
-    // 等级
-    let rankElemnt = document.querySelector(".user-info .user-rank-rst");
-    for (const className of rankElemnt.classList) {
-      if (className.includes("urr-rank")) {
-        resultObject["rank"] = parseInt(className.replace("urr-rank", ""));
+      // 是否为VIP
+      if (document.querySelector(".icon-vip")) {
+        resultObject["is_vip"] = true;
+      } else {
+        resultObject["is_vip"] = false;
       }
-    }
 
-    // 性别
-    if (document.querySelector(".woman")) {
-      resultObject["gender"] = "woman";
-    } else if (document.querySelector(".man")) {
-      resultObject["gender"] = "man";
-    } else {
-      resultObject["gender"] = "unknown";
-    }
+      // 等级
+      let rankElemnt = document.querySelector(".user-info .user-rank-rst");
+      for (const className of rankElemnt.classList) {
+        if (className.includes("urr-rank")) {
+          resultObject["rank"] = parseInt(className.replace("urr-rank", ""));
+        }
+      }
 
-    // 城市
-    resultObject["city"] = document.querySelector(".user-groun").innerText;
+      // 性别
+      if (document.querySelector(".woman")) {
+        resultObject["gender"] = "woman";
+      } else if (document.querySelector(".man")) {
+        resultObject["gender"] = "man";
+      } else {
+        resultObject["gender"] = "unknown";
+      }
 
-    // 注册时间
-    resultObject["register_time"] = document
-      .querySelector(".user-time")
-      .innerText.replace("注册时间：", "");
+      // 城市
+      resultObject["city"] = document.querySelector(".user-groun").innerText;
 
-    let attentionElementList = document.querySelectorAll(
-      ".user_atten li strong"
-    );
-    for (let attentionElement of attentionElementList) {
-      attentionElement.style.width = "fit-content";
-      attentionElement.style.lineHeight = 1;
+      // 注册时间
+      resultObject["register_time"] = document
+        .querySelector(".user-time")
+        .innerText.replace("注册时间：", "");
 
-      // 只包含一个矢量元素，则在最后面添加“个”字，提高OCR识别成功率。
-      // 其实这里应该用子节点数量，而不是子元素数量。因为有的数字不会用矢量加密，而是直接是文本节点
-      // 但是这样也没啥问题，可以就行
-      // if (attentionElement.childElementCount < 2) {
-      //     attentionElement.append('个')
-      // }
+      let attentionElementList = document.querySelectorAll(
+        ".user_atten li strong"
+      );
+      for (let attentionElement of attentionElementList) {
+        attentionElement.style.width = "fit-content";
+        attentionElement.style.lineHeight = 1;
 
-      // 还是全部都加“个”更好。有的两个数字还是会被识别错
-      attentionElement.append("个");
-    }
+        // 只包含一个矢量元素，则在最后面添加“个”字，提高OCR识别成功率。
+        // 其实这里应该用子节点数量，而不是子元素数量。因为有的数字不会用矢量加密，而是直接是文本节点
+        // 但是这样也没啥问题，可以就行
+        // if (attentionElement.childElementCount < 2) {
+        //     attentionElement.append('个')
+        // }
 
-    return resultObject;
-  });
+        // 还是全部都加“个”更好。有的两个数字还是会被识别错
+        attentionElement.append("个");
+      }
+
+      return resultObject;
+    })
+    .catch(async (reason) => {
+      let pageContent = await page.content();
+      console.log(reason);
+    });
 
   // 原始链接、ID
   resultObject["url"] = url;
