@@ -40,7 +40,7 @@ async function pageGotoVerify(page, url) {
     // 验证页面
     if (pageTitle == "验证中心") {
       console.log(`当前页面：${url}`);
-      await verify();
+      await verify(url);
       console.log("验证成功");
       await pageGoto(page, url);
     }
@@ -81,38 +81,19 @@ async function pageGotoVerify(page, url) {
  * 自动打开页面进行验证
  * @returns
  */
-async function verify() {
+async function verify(url) {
   const { browser, page } = await launchPage();
   if (newCookies) {
     await page.setCookie(...newCookies);
   } else {
     await page.setCookie(...dianping_cookie);
   }
-  await pageGoto(
-    page,
-    "http://www.dianping.com/shop/l4twNneJonrrRkFe/review_all/p58?queryType=sortType&queryVal=latest"
-  );
-
-  let verifyResolve;
-  let promise = new Promise((resolve) => {
-    verifyResolve = resolve;
+  await pageGoto(page, url);
+  await page.waitForSelector(".dpHeader > .dpLogo", {
+    timeout: 0,
+    hidden: true,
   });
-
-  await page.waitForSelector("a.logo-view", { timeout: 0 });
-  verifyResolve();
-
-  async function checkVerify() {
-    if ((await page.title()) != "验证中心") {
-      verifyResolve();
-      return;
-    }
-    setTimeout(checkVerify, 1000);
-  }
-  // checkVerify();
-
   await browser.close();
-
-  return promise;
 }
 
 /**
@@ -122,11 +103,8 @@ async function verify() {
  */
 async function login() {
   const { browser, page } = await launchPage();
-  await pageGoto(
-    page,
-    "https://account.dianping.com/login?redir=https://www.dianping.com/member/8084928"
-  );
-  await page.waitForSelector("div#top-nav .icon-logo", { timeout: 0 });
+  await pageGoto(page, "https://account.dianping.com/login");
+  await page.waitForSelector("div.login-wrap", { timeout: 0, hidden: true });
   let loginCookies = await page.cookies();
   await browser.close();
   newCookies = loginCookies;

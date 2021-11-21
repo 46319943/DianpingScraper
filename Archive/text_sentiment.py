@@ -1,9 +1,7 @@
 import paddlehub as hub
 import os
-import paddle
 
-# 显存不足，无法使用GPU版本
-# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 # Load ernie_skep_sentiment_analysis module.
 module = hub.Module(name="ernie_skep_sentiment_analysis")
