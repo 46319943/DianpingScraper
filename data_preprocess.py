@@ -26,11 +26,27 @@ def calculate_text_sentiment(item):
     return item
 
 
+def sentiment_shap(item):
+    '''
+    计算条目文本的情感贡献值
+    '''
+    from customer_shap import explain_text
+
+    text = item['text']
+    if text == '':
+        return item
+    token_shap_list = explain_text(text)
+    item['text_shap'] = token_shap_list
+
+    return item
+
+
 def process_item(item):
     '''
     处理单个条目
     '''
-    item = calculate_text_sentiment(item)
+    # item = calculate_text_sentiment(item)
+    item = sentiment_shap(item)
 
     return item
 
@@ -45,9 +61,15 @@ def iter_item(query=None):
         **{field: True for field in fetch_field},
         **{field: False for field in obsolete_field}
     }
+    if len(projection_field) == 0:
+        projection_field = None
 
     if query is None:
         query = {}
+
+    unset_dict = {field: '' for field in obsolete_field}
+    if len(unset_dict) == 0:
+        unset_dict = None
 
     query_result_list = list(collection.find(
         query,
@@ -59,7 +81,7 @@ def iter_item(query=None):
             {'id': item['id']},
             {
                 "$set": dict(item),
-                '$unset': {field: '' for field in obsolete_field}
+                # '$unset': unset_dict
             },
             upsert=True
         )
@@ -68,5 +90,5 @@ def iter_item(query=None):
 
 if __name__ == '__main__':
     iter_item(
-        {'text_sentiment_score': {'$exists': False}}
+        {'text_shap': {'$exists': False}}
     )
