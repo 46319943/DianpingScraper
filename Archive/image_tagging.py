@@ -88,12 +88,12 @@ def get_dianping_imamge_src(url):
 # mongo_client = pymongo.MongoClient("mongodb://admin:admin123@101.132.152.93:27017")
 
 mongo_client = None
-mongo_dianping_db = None
-mongo_comment_dianping = None
+mongo_db = None
+collection = None
 
 
 async def dianping_image_process(task_num=20):
-    global mongo_client, mongo_dianping_db, mongo_comment_dianping
+    global mongo_client, mongo_db, collection
 
     mongo_client = motor.motor_asyncio.AsyncIOMotorClient("mongodb://admin:admin123@101.132.152.93:27017")
     mongo_dianping_db = mongo_client["dianping"]
@@ -119,9 +119,9 @@ async def dianping_comment_list_process(comment_list):
                 for label_object in label_result
             ]
             image_meta['label_list'] = label_list
-        await mongo_comment_dianping.update_one({'_id': comment['_id']},
-                                                {'$set': comment}
-                                                )
+        await collection.update_one({'_id': comment['_id']},
+                                    {'$set': comment}
+                                    )
 
 
 asyncio.run(dianping_image_process())
