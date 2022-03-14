@@ -6,6 +6,7 @@ const dayjs = require("dayjs");
 
 const { pageGotoVerify } = require("./puppeteer_utils");
 const { scrape_time } = require("./scrape_utils");
+const { dianping } = require("./db/mongo");
 
 /**
  * 爬取大众点评某一景点评论
@@ -210,17 +211,17 @@ async function scrapeCommentListPage(
     // 是否重新进行文本识别并覆盖
     if (!overwrite) {
       // 判断是否已经存在
-      let existQueryResult = await (
-        await mongo.huanghelou
-      ).findOne(
-        { id: resultObject["id"] },
-        {
-          projection: {
-            id: 1,
-            // 'image_list': 1
-          },
-        }
-      );
+      let existQueryResult = await (await dianping)
+        .collection(dianping_name)
+        .findOne(
+          { id: resultObject["id"] },
+          {
+            projection: {
+              id: 1,
+              // 'image_list': 1
+            },
+          }
+        );
       if (existQueryResult) {
         continue;
       }
@@ -275,13 +276,13 @@ async function scrapeCommentListPage(
 
     // 打印、存入数据库
     console.log(resultObject);
-    let updateMongoResult = await (
-      await mongo.huanghelou
-    ).updateOne(
-      { id: resultObject["id"] },
-      { $set: resultObject },
-      { upsert: true }
-    );
+    let updateMongoResult = await (await dianping)
+      .collection(dianping_name)
+      .updateOne(
+        { id: resultObject["id"] },
+        { $set: resultObject },
+        { upsert: true }
+      );
   }
 
   return true;

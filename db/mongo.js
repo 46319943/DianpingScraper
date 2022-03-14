@@ -7,11 +7,10 @@ let dianping = client.then((client) => client.db("dianping"));
 
 module.exports = {
   client,
+  dianping,
   news: dianping,
   comment: dianping.then((db) => db.collection("comment")),
-  huanlegu: dianping.then((db) => db.collection("huanlegu")),
   user: dianping.then((db) => db.collection("user")),
-  huanghelou: dianping.then((db) => db.collection("huanghelou")),
   ObjectID,
   ID: (id) => new ObjectID(id),
 };
