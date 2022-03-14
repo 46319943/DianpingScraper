@@ -15,7 +15,7 @@ app = Flask(__name__)
 ocr = PaddleOCR(
     det_model_dir=r'C:\Users\PiaoYang\.paddleocr\ch_ppocr_server_v1.1_det_infer',
     rec_model_dir=r'C:\Users\PiaoYang\.paddleocr\ch_ppocr_server_v1.1_rec_infer',
-    use_angle_cls=True, lang="ch", use_gpu=False)
+    use_angle_cls=True, lang="ch", use_gpu=True, rec_batch_num=10)
 
 
 @app.route('/', methods=['POST'])
