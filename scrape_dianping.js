@@ -9,7 +9,8 @@ const { dianping_cookie } = require("./global_variables");
 
 async function main() {
   const browser = await puppeteerExtra.launch({
-    headless: true,
+    // headless: true,
+    headless: false,
     defaultViewport: null,
     args: [
       "--start-maximized", // you can also use '--start-fullscreen'
@@ -27,7 +28,7 @@ async function main() {
   // TODO: 降级Puppeteer到9.1.1版本，避免截图BUG
   // TODO: 降级之后还是有截图BUG，肯定是依赖库什么什么的原因。还是就用无界面模式好了
 
-  await scrapeComment(page, "k6uv5d5ACvoyqypQ", "武汉大学", { page_index: 14 });
+  await scrapeComment(page, "ioJT5EexMUvZwVrB", "环秀山庄", { page_index: 1 });
 
   // await scrapeDianpingUserInDB(page);
 
