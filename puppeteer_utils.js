@@ -67,6 +67,14 @@ async function pageGotoVerify(page, url) {
       let newCookies = await login();
       await page.setCookie(...newCookies);
     }
+    // 403 forbidden
+    else if (pageContent.includes("403 Forbidden")) {
+      console.log(`403 Forbidden：${url}`);
+      await clearLocal(page);
+      await page.deleteCookie(...(await page.cookies()));
+      let newCookies = await login();
+      await page.setCookie(...newCookies);
+    }
     // 页面正常
     else {
       console.log(`page navigate to ${url}`);
