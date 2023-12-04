@@ -13,8 +13,9 @@ os.environ['KMP_DUPLICATE_LIB_OK']='True'
 app = Flask(__name__)
 
 ocr = PaddleOCR(
-    det_model_dir=r'C:\Users\PiaoYang\.paddleocr\ch_ppocr_server_v1.1_det_infer',
-    rec_model_dir=r'C:\Users\PiaoYang\.paddleocr\ch_ppocr_server_v1.1_rec_infer',
+    det_model_dir=r'C:\Users\PiaoYang\.paddleocr\ch_PP-OCRv4_det_server_infer',
+    # det_model_dir=r'C:\Users\PiaoYang\.paddleocr\ch_ppocr_server_v1.1_det_infer',
+    # rec_model_dir=r'C:\Users\PiaoYang\.paddleocr\ch_ppocr_server_v1.1_rec_infer',
     use_angle_cls=True, lang="ch", use_gpu=True, rec_batch_num=10)
 
 
@@ -62,6 +63,10 @@ def ocr_img(img: Union[np.ndarray, ImageClass]) -> (List, Image):
     img_padding = cv2.copyMakeBorder(img, 75, 75, 75, 75, cv2.BORDER_CONSTANT,
                                      value=[255, 255, 255])
     result = ocr.ocr(img_padding, cls=True)
+    result = result[0]
+
+    if result is None:
+        print()
 
     for line in result:
         print(line)
@@ -98,4 +103,4 @@ def ocr_img_path(img_path):
     image_result.save(f'test.png')
 
 
-app.run(host='0.0.0.0', port=8890, use_reloader=False, debug=True)
+app.run(host='0.0.0.0', port=5001, use_reloader=False, debug=True)
