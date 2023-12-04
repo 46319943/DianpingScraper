@@ -34,6 +34,8 @@ async function scrapeComment(
     )
   ) {
     page_index++;
+    // Wait for 1s to avoid being blocked
+    await page.waitForTimeout(3000);
   }
 }
 
@@ -240,7 +242,7 @@ async function scrapeCommentListPage(
       "img",
       fs.createReadStream(`Screenshot/${resultObject["id"]}.png`)
     );
-    const res = await axios.post("http://localhost:8890/", formData, {
+    const res = await axios.post("http://127.0.0.1:5001/", formData, {
       // You need to use `getHeaders()` in Node.js because Axios doesn't
       // automatically set the multipart form boundary in Node.
       headers: formData.getHeaders(),
