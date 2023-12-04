@@ -9,14 +9,14 @@ puppeteerExtra.use(StealthPlugin());
 
 /**
  * 访问页面，自动超时重试
- * @param {*} page
+ * @param {import('puppeteer').Page} page
  * @param {*} url
  */
 async function pageGoto(page, url) {
   // 访问超时循环
   while (true) {
     try {
-      await page.goto(url, { timeout: 15000 });
+      await page.goto(url, { timeout: 15000, referer: "http://www.dianping.com/" });
       break;
     } catch (error) {
       console.log("time out error occur");
@@ -105,7 +105,7 @@ async function verify(url) {
 async function login() {
   const { browser, page } = await launchPage();
   await pageGoto(page, "https://account.dianping.com/login");
-  await page.waitForSelector("div.login-wrap", { timeout: 0, hidden: true });
+  await page.waitForSelector("div.login-wrap-prod", { timeout: 0, hidden: true });
   let loginCookies = await page.cookies();
   await browser.close();
   newCookies = loginCookies;
