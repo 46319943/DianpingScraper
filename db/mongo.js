@@ -1,7 +1,7 @@
 const MongoClient = require("mongodb").MongoClient;
 const ObjectID = require("mongodb").ObjectID;
 
-let url = "mongodb://localhost:27017";
+let url = "mongodb://127.0.0.1:27017";
 let client = MongoClient.connect(url);
 let dianping = client.then((client) => client.db("dianping"));
 
