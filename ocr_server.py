@@ -60,8 +60,9 @@ def ocr_img(img: Union[np.ndarray, ImageClass]) -> (List, Image):
     img = np.array(img)
 
     # 文字检测+识别，需要对图片进行边界填充
-    img_padding = cv2.copyMakeBorder(img, 75, 75, 75, 75, cv2.BORDER_CONSTANT,
-                                     value=[255, 255, 255])
+    padding_size = 150
+    img_padding = cv2.copyMakeBorder(img, padding_size, padding_size, padding_size, padding_size,
+                                     cv2.BORDER_CONSTANT, value=[255, 255, 255])
     result = ocr.ocr(img_padding, cls=True)
     result = result[0]
 
@@ -102,5 +103,5 @@ def ocr_img_path(img_path):
     result, image_result = ocr_img(img_obj)
     image_result.save(f'test.png')
 
-
+# Issue of prot unavailable. https://github.com/XX-net/XX-Net/issues/13552
 app.run(host='0.0.0.0', port=5001, use_reloader=False, debug=True)
