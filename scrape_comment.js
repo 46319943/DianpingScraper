@@ -41,7 +41,7 @@ async function scrapeComment(
 
 /**
  * @param {import('puppeteer').Page} page
- * @param {string} url
+ * @param {string} page_index
  * @param {string} dianping_id 大众点评的景点ID
  * @param {string} dianping_name 大众点评的景点名称
  *
@@ -249,7 +249,7 @@ async function scrapeCommentListPage(
     });
     resultObject["text"] = res.data;
 
-    // 记录爬取时间、戳
+    // 记录爬取时间（时间字符串、时间戳）
     resultObject = scrape_time(resultObject);
 
     // 解析时间
